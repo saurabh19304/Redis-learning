@@ -8,9 +8,16 @@ export async function  incrementViews(postId){
  return view
 }
 
-export function increaseScore(userId, actualScore){
+export  async function increaseScore(userId, actualScore){
 
-  const score = redis.zincrby('posts:leaderboard', actualScore, `posts:${userId}`);
+  const score = await  redis.zincrby('user:leaderboard', actualScore, `user:${userId}`);
 
   return score;
 }
+
+export async  function topLeaderboard(){
+
+  const top = await redis.zrevrange('user:leaderboard', 0 , 9, "WITHSCORES");
+  
+  return top;
+};

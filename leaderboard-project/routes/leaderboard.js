@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import incrementViews from '../services/leaderboard.js'
-import { increaseScore } from '../services/leaderboard.js';
+import { increaseScore, topLeaderboard, incrementViews } from '../services/leaderboard.js';
+
 import redis from '../redis/client.js';
 
 const router = Router();
@@ -23,7 +23,7 @@ router.post('/leaderboard/score', async (req, res) => {
 
   const { userId, points} = req.body;
 
-  const attempts = await redis.incr(`user:${usertId}:attempts`);
+  const attempts = await redis.incr(`user:${userId}:attempts`);
   const actualScore = attempts === 1 ? points : points/2;
 
   const score = await increaseScore(userId, actualScore);
@@ -36,5 +36,13 @@ router.post('/leaderboard/score', async (req, res) => {
   });
 
 });
+
+
+router.get('/leaderboard', async (req, res) => {
+
+  const leaderboard = await topLeaderboard();
+  res.json({ message: "here is the top 10 scores", leaderboard , score })
+  
+})
 
 export default router;
